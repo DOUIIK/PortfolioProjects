@@ -2,14 +2,11 @@ SELECT *
 FROM PortfolioProject..['owid-covid-data$']	
 order by 3,4
 
-select Location,date,total_cases ,new_cases , total_deaths,population
-from PortfolioProject..['owid-covid-data$']
-order by 1,2
-
+	
 --looking at total cases vs total deaths 
-select Location,date,total_cases,total_deaths,(CONVERT(int,total_deaths)/CONVERT(int,total_cases))*100 as DeathPourcentage
+select Location,date,total_cases,total_deaths,(CONVERT(INT,total_deaths)/CONVERT(INT,total_cases))*100 AS DeathPourcentage
 from PortfolioProject..['owid-covid-data$']
-where location like '%Tunisi%' and total_cases is not null and total_deaths is not null
+where location like '%Tunisi%' and total_cases <> 0 and total_deaths <> 0
 order by 1,2
 
 --looking at total cases vs population 
@@ -123,7 +120,7 @@ order by TotalDeathCount desc
 
 -- GLOBAL NUMBERS
 
-Select SUM(new_cases) as total_cases, SUM(cast(new_deaths as int)) as total_deaths, SUM(cast(new_deaths as int))/SUM(New_Cases)*100 as DeathPercentage
+Select SUM(new_cases) as total_cases, SUM(cast(new_deaths AS INT)) as total_deaths, SUM(cast(new_deaths AS INT))/SUM(New_Cases)*100 AS DeathPercentage
 From PortfolioProject..['owid-covid-data$']
 --Where location like '%Tunisi%'
 where continent is not null 
@@ -138,7 +135,6 @@ order by 1,2
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
 , SUM(CONVERT(int,vac.new_vaccinations)) OVER (Partition by dea.Location Order by dea.location, dea.Date) as RollingPeopleVaccinated
 --, (RollingPeopleVaccinated/population)*100
-From PortfolioProject..['owid-covid-data$']
 From PortfolioProject..CovidDeaths dea
 Join PortfolioProject..CovidVaccinations vac
 	On dea.location = vac.location
@@ -155,7 +151,6 @@ as
 Select dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
 , SUM(CONVERT(int,vac.new_vaccinations)) OVER (Partition by dea.Location Order by dea.location, dea.Date) as RollingPeopleVaccinated
 --, (RollingPeopleVaccinated/population)*100
-From PortfolioProject..['owid-covid-data$']
 From PortfolioProject..CovidDeaths dea
 Join PortfolioProject..CovidVaccinations vac
 	On dea.location = vac.location
@@ -208,5 +203,6 @@ From PortfolioProject..CovidDeaths dea
 Join PortfolioProject..CovidVaccinations vac
 	On dea.location = vac.location
 	and dea.date = vac.date
-where dea.continent is not null 
+where dea.continent is not null
+
 
